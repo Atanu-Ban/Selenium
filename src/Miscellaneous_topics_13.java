@@ -3,13 +3,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.apache.commons.io.FileUtils;
 import org.testng.asserts.SoftAssert;
-
-
-
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,33 +48,57 @@ public class Miscellaneous_topics_13 {
         //'a[href*="soapui"]
 
         driver.get("https://rahulshettyacademy.com/AutomationPractice/");
-        String url=driver.findElement(By.cssSelector("a[href*='soapui']")).getAttribute("href");
 
-       HttpURLConnection conn =(HttpURLConnection) new URL(url).openConnection();
-       conn.setRequestMethod("HEAD");
-       conn.connect();
-       int responseCode = conn.getResponseCode();
-       System.out.println(responseCode);
+// Single link check
+        String url = driver.findElement(By.cssSelector("a[href*='soapui']"))
+                .getAttribute("href");
 
-       //Verify All footer link
-        driver.get("https://rahulshettyacademy.com/AutomationPractice/");
-        List<WebElement> links=   driver.findElements(By.cssSelector("li[class='gf-li'] a"));
-        SoftAssert a =new SoftAssert();
-        for(WebElement link : links)
+        HttpURLConnection conn =
+                (HttpURLConnection) new URL(url).openConnection();
 
-        {
-            String url1= link.getAttribute("href");
-            HttpURLConnection conn1 =
-                    (HttpURLConnection) new URL(url1).openConnection();
+        conn.setRequestMethod("HEAD");
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
+        conn.connect();
 
-            conn1.setRequestMethod("HEAD");
-            conn1.setConnectTimeout(5000);
-            conn1.setReadTimeout(5000);
-            conn1.connect();
-            int respCode = connt.getResponseCode();
-            System.out.println(respCode);
-            a.assertTrue(respCode>400, "The link with Text"+link.getText()+" is broken with code" +respCode);
-           }
+        int responseCode = conn.getResponseCode();
+        System.out.println("SoapUI link --> " + responseCode);
+
+// Verify all footer links
+        List<WebElement> links =
+                driver.findElements(By.cssSelector("li.gf-li a"));
+
+        SoftAssert a = new SoftAssert();
+
+        for (WebElement link : links) {
+
+            String url1 = link.getAttribute("href");
+
+            try {
+                HttpURLConnection connt =
+                        (HttpURLConnection) new URL(url1).openConnection();
+
+                connt.setRequestMethod("HEAD");
+                connt.setConnectTimeout(5000);
+                connt.setReadTimeout(5000);
+                connt.connect();
+
+                int respCode = connt.getResponseCode();
+                System.out.println(link.getText() + " --> " + respCode);
+
+                a.assertTrue(respCode < 400,
+                        "❌ Broken link: " + link.getText()
+                                + " | URL: " + url1
+                                + " | Code: " + respCode);
+
+            } catch (Exception e) {
+                a.fail("❌ Exception for link: " + link.getText()
+                        + " | URL: " + url1
+                        + " | Error: " + e.getMessage());
+            }
+        }
+
+        a.assertAll();
        }
 
     }
