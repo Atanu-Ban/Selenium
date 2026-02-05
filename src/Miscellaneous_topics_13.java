@@ -6,6 +6,8 @@ import org.testng.asserts.SoftAssert;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.Map;
 
 public class Miscellaneous_topics_13 {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
 
         //Handaling HTTP Certification
         ChromeOptions options = new ChromeOptions();
@@ -54,7 +56,7 @@ public class Miscellaneous_topics_13 {
                 .getAttribute("href");
 
         HttpURLConnection conn =
-                (HttpURLConnection) new URL(url).openConnection();
+                (HttpURLConnection) new URI(url).toURL().openConnection();
 
         conn.setRequestMethod("HEAD");
         conn.setConnectTimeout(5000);
@@ -76,7 +78,7 @@ public class Miscellaneous_topics_13 {
 
             try {
                 HttpURLConnection connt =
-                        (HttpURLConnection) new URL(url1).openConnection();
+                        (HttpURLConnection) new URI(url1).toURL().openConnection();
 
                 connt.setRequestMethod("HEAD");
                 connt.setConnectTimeout(5000);
